@@ -176,7 +176,7 @@ const AnalizadorAcademico = {
   },
 };
 
-// Sistema de matricula (con validaciones)
+// Sistema de matrícula (con validaciones)
 const Matricula = {
   matricularAlumno(nombre, edad, carrera) {
     const nuevoAlumno = {
