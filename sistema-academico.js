@@ -37,6 +37,29 @@ const estudiantes = [
   },
 ];
 
+// Función de orden superior que crea validadores
+const crearValidador = (fn, mensajeError) => (valor) =>
+  fn(valor) ? { valido: true, valor } : { valido: false, error: mensajeError };
+
+const esNumeroPositivo = (valor) => typeof valor === "number" && valor > 0;
+const esStringNoVacio = (valor) =>
+  typeof valor === "string" && valor.trim().length > 0;
+
+const validarEdad = crearValidador(
+  esNumeroPositivo,
+  "La edad debe ser un número positivo"
+);
+
+const validarNombre = crearValidador(
+  esStringNoVacio,
+  "El nombre no puede estar vacío"
+);
+
+const validarCarrera = crearValidador(
+  esStringNoVacio,
+  "La carrera no puede estar vacía"
+);
+
 // Sistema de análisis académico
 const AnalizadorAcademico = {
   // Calcular promedio ponderado por estudiante
@@ -153,6 +176,22 @@ const AnalizadorAcademico = {
   },
 };
 
+// Sistema de matrícula (con validaciones)
+const Matricula = {
+  matricularAlumno(nombre, edad, carrera) {
+    const nuevoAlumno = {
+      id: estudiantes.length + 1,
+      nombre: validarNombre(nombre).valor.trim(),
+      edad: validarEdad(edad).valor,
+      carrera: validarCarrera(carrera).valor.trim(),
+      calificaciones: [],
+      activo: true,
+    };
+
+    estudiantes.push(nuevoAlumno);
+  },
+};
+
 // Demostración del sistema
 console.log("🎓 SISTEMA DE ANÁLISIS ACADÉMICO\n");
 
@@ -251,3 +290,10 @@ console.log(
 );
 
 console.log("\n✅ Sistema de análisis académico completado exitosamente!");
+
+console.log("\n Probando sistema de matricula con validaciones");
+
+Matricula.matricularAlumno("Alejandro Barrera", 34, "Ingeniería Informática");
+Matricula.matricularAlumno("Juan Perez", 82, "Gastronomía");
+
+console.log(estudiantes);
