@@ -60,8 +60,55 @@ const validarCarrera = crearValidador(
   "La carrera no puede estar vacía"
 );
 
+const validarAsignatura = crearValidador(
+  esStringNoVacio,
+  "La asignatura no puede estar vacía"
+);
+
+const validarNota = crearValidador(
+  esNumeroPositivo,
+  "La nota debe ser un número positivo"
+);
+
+const validarCreditos = crearValidador(
+  esNumeroPositivo,
+  "Los créditos deben ser un número positivo"
+);
+
 // Sistema de análisis académico
 const AnalizadorAcademico = {
+  // Convertir nota 0-10 a puntos GPA 4.0
+  convertirNotaAGPA(nota) {
+    if (nota >= 9.0) return 4.0;
+    if (nota >= 8.0) return 3.3;
+    if (nota >= 7.0) return 3.0;
+    if (nota >= 6.0) return 2.7;
+    if (nota >= 5.0) return 2.0;
+    return 0.0; // Notas < 5.0
+  },
+
+  // Calcular GPA ponderado por estudiante
+  calcularGPA(estudiante) {
+    const { calificaciones } = estudiante;
+
+    const calificacionesGPA = calificaciones.map((cal) => ({
+      ...cal,
+      puntosGPA: this.convertirNotaAGPA(cal.nota),
+    }));
+
+    const sumaPonderadaGPA = calificacionesGPA.reduce(
+      (sum, cal) => sum + cal.puntosGPA * cal.creditos,
+      0
+    );
+
+    const totalCreditos = calificaciones.reduce(
+      (sum, cal) => sum + cal.creditos,
+      0
+    );
+
+    return totalCreditos > 0 ? sumaPonderadaGPA / totalCreditos : 0;
+  },
+
   // Calcular promedio ponderado por estudiante
   calcularPromedioPonderado(estudiante) {
     const { calificaciones } = estudiante;
@@ -177,7 +224,7 @@ const AnalizadorAcademico = {
 };
 
 // Sistema de matrícula (con validaciones)
-const Matricula = {
+const Academia = {
   matricularAlumno(nombre, edad, carrera) {
     const nuevoAlumno = {
       id: estudiantes.length + 1,
@@ -189,6 +236,29 @@ const Matricula = {
     };
 
     estudiantes.push(nuevoAlumno);
+    console.log(
+      `✅ Se ingreso nuevo alumno: ${nombre} a la carrera: ${carrera}`
+    );
+  },
+
+  ingresarCalificacion(idAlumno, asignatura, nota, creditos) {
+    const indice = estudiantes.findIndex((e) => e.id === idAlumno);
+
+    if (indice === -1) {
+      console.log("❌ El id ingresado no es válido");
+      return;
+    }
+
+    const nuevaCalificacion = {
+      asignatura: validarAsignatura(asignatura).valor,
+      nota: validarNota(nota).valor,
+      creditos: validarCreditos(creditos).valor,
+    };
+
+    estudiantes[indice].calificaciones.push(nuevaCalificacion);
+    console.log(
+      `✅ Se ingreso calificación a alumno: ${estudiantes[indice].nombre} `
+    );
   },
 };
 
@@ -291,9 +361,22 @@ console.log(
 
 console.log("\n✅ Sistema de análisis académico completado exitosamente!");
 
-console.log("\n Probando sistema de matricula con validaciones");
+console.log("\n✏️  Sistema de matricula con validaciones");
 
-Matricula.matricularAlumno("Alejandro Barrera", 34, "Ingeniería Informática");
-Matricula.matricularAlumno("Juan Perez", 82, "Gastronomía");
+Academia.matricularAlumno("Alejandro Barrera", 34, "Ingeniería Informática");
+Academia.matricularAlumno("Juan Perez", 82, "Gastronomía");
 
-console.log(estudiantes);
+Academia.ingresarCalificacion(4, "Matemáticas", 7.5, 4);
+
+console.log("\n⭐ Cálculo de GPA:");
+
+const gpas = estudiantes
+  .filter((estudiante) => estudiante.calificaciones.length > 0)
+  .map((estudiante) => ({
+    nombre: estudiante.nombre,
+    gpa: Math.round(AnalizadorAcademico.calcularGPA(estudiante) * 100) / 100,
+  }));
+
+gpas.forEach(({ nombre, gpa }) => {
+  console.log(`- ${nombre}: GPA ${gpa}`);
+});
