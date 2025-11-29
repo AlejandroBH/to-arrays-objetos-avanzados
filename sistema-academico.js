@@ -124,6 +124,17 @@ const AnalizadorAcademico = {
     return totalCreditos > 0 ? sumaPonderada / totalCreditos : 0;
   },
 
+  // Método para predicción simple basado en promedio ponderado
+  predecirRendimiento(estudiante) {
+    const promedioActual = this.calcularPromedioPonderado(estudiante);
+    const prediccion = Math.round(promedioActual * 100) / 100;
+
+    return {
+      prediccionNotaFutura: prediccion,
+      basadoEnPromedioPonderadoActual: promedioActual,
+    };
+  },
+
   // Obtener mejores estudiantes por carrera
   mejoresPorCarrera(estudiantes, limite = 3) {
     // Agrupar por carrera
@@ -257,7 +268,7 @@ const Academia = {
 
     estudiantes[indice].calificaciones.push(nuevaCalificacion);
     console.log(
-      `✅ Se ingreso calificación a alumno: ${estudiantes[indice].nombre} `
+      `✅ Se ingreso calificación de ${asignatura} (${nota}) a alumno: ${estudiantes[indice].nombre} `
     );
   },
 };
@@ -359,14 +370,14 @@ console.log(
   }`
 );
 
-console.log("\n✅ Sistema de análisis académico completado exitosamente!");
-
-console.log("\n✏️  Sistema de matricula con validaciones");
+// 6. Sistema de matrícula con validaciones e ingreso de calificaciones
+console.log("\n✏️  SISTEMA DE MATRICULA");
 
 Academia.matricularAlumno("Alejandro Barrera", 34, "Ingeniería Informática");
 Academia.matricularAlumno("Juan Perez", 82, "Gastronomía");
 
 Academia.ingresarCalificacion(4, "Matemáticas", 7.5, 4);
+Academia.ingresarCalificacion(4, "Programación", 9.2, 9);
 
 console.log("\n⭐ Cálculo de GPA:");
 
@@ -380,3 +391,22 @@ const gpas = estudiantes
 gpas.forEach(({ nombre, gpa }) => {
   console.log(`- ${nombre}: GPA ${gpa}`);
 });
+
+// 7. Predicción de rendimiento para estudiantes existentes
+console.log("\n🔮 PREDICCIÓN DE RENDIMIENTO FUTURO:");
+
+const predicciones = estudiantes
+  .filter((e) => e.calificaciones.length > 0) // Solo estudiantes con calificaciones
+  .map((estudiante) => ({
+    nombre: estudiante.nombre,
+    prediccion:
+      AnalizadorAcademico.predecirRendimiento(estudiante).prediccionNotaFutura,
+  }));
+
+predicciones.forEach(({ nombre, prediccion }) => {
+  console.log(
+    `Se predice que ${nombre} obtendrá una nota futura de: ${prediccion}`
+  );
+});
+
+console.log("\n✅ Sistema de análisis académico completado exitosamente!");
