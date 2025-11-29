@@ -232,6 +232,57 @@ const AnalizadorAcademico = {
       },
     };
   },
+
+  // Nuevo método: Simular la generación de un reporte en formato PDF (salida en consola)
+  generarReportePDFSimulado(estudiante) {
+    const reporteData = this.generarReporte(estudiante);
+    const { estudiante: infoEstudiante, rendimiento, detalle } = reporteData;
+
+    // Título del Reporte
+    let pdfSimulado = "=================================================\n";
+    pdfSimulado += `           📑 REPORTE ACADÉMICO OFICIAL           \n`;
+    pdfSimulado += "=================================================\n\n";
+
+    // Sección de Información del Estudiante
+    pdfSimulado += "[ 👤 Información del Estudiante ]\n";
+    pdfSimulado += `Nombre: ${infoEstudiante.nombre}\n`;
+    pdfSimulado += `Edad: ${infoEstudiante.edad} años\n`;
+    pdfSimulado += `Carrera: ${infoEstudiante.carrera}\n`;
+    pdfSimulado += `Estado: ${
+      infoEstudiante.activo ? "ACTIVO" : "INACTIVO"
+    }\n\n`;
+
+    // Sección de Rendimiento General
+    pdfSimulado += "[ 📈 Rendimiento General ]\n";
+    pdfSimulado += `Promedio Ponderado: ${
+      Math.round(rendimiento.promedio * 100) / 100
+    } (Máx. 10)\n`;
+    pdfSimulado += `Total Asignaturas Cursadas: ${rendimiento.totalAsignaturas}\n`;
+    pdfSimulado += `Asignaturas Aprobadas (>= 7.0): ${rendimiento.asignaturasAprobadas}\n`;
+    pdfSimulado += `Rango de Notas: ${rendimiento.peorNota} - ${rendimiento.mejorNota}\n\n`;
+
+    // Sección de Detalle de Calificaciones
+    pdfSimulado += "[ 📚 Detalle de Calificaciones ]\n";
+
+    if (detalle.primeraAsignatura) {
+      pdfSimulado += `1. Primera: ${detalle.primeraAsignatura.asignatura} (Nota: ${detalle.primeraAsignatura.nota}, Créditos: ${detalle.primeraAsignatura.creditos})\n`;
+    }
+    if (detalle.segundaAsignatura) {
+      pdfSimulado += `2. Segunda: ${detalle.segundaAsignatura.asignatura} (Nota: ${detalle.segundaAsignatura.nota}, Créditos: ${detalle.segundaAsignatura.creditos})\n`;
+    }
+    pdfSimulado += `... y ${detalle.otrasAsignaturas} asignaturas adicionales.\n\n`;
+
+    // Sección de Pie de Reporte
+    pdfSimulado += "=================================================\n";
+    pdfSimulado += `Fecha de Generación: ${new Date().toLocaleDateString(
+      "es-ES"
+    )}\n`;
+    pdfSimulado +=
+      "Nota: Este es un reporte simulado para fines de demostración.\n";
+    pdfSimulado += "=================================================\n";
+
+    return pdfSimulado;
+  },
 };
 
 // Sistema de matrícula (con validaciones)
@@ -409,4 +460,14 @@ predicciones.forEach(({ nombre, prediccion }) => {
   );
 });
 
-console.log("\n✅ Sistema de análisis académico completado exitosamente!");
+// 8. Generar Reporte PDF Simulado
+console.log("\n📄 GENERACIÓN DE REPORTE PDF SIMULADO:");
+
+const estudianteAReportar = estudiantes[2];
+
+const reportePDF =
+  AnalizadorAcademico.generarReportePDFSimulado(estudianteAReportar);
+
+console.log(reportePDF);
+
+console.log("✅ Sistema de análisis académico completado exitosamente!");
